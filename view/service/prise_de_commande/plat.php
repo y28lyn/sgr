@@ -246,7 +246,7 @@ if ($_SESSION["role"] == "service") {
 
                                             <input type="hidden" name="action" value="modifier_commentaire">
 
-                                            <input type="text" name="commentaire" size="5" value="<?php echo isset($_POST['commentaire']) ? htmlspecialchars($_POST['commentaire']) : $plat['commentaire']; ?>" placeholder="<?php echo $plat['commentaire'] ?>">
+                                            <input type="text" name="commentaire" size="5" value="<?php echo isset($_POST['commentaire']) ? htmlspecialchars($_POST['commentaire']) : $plat['commentaire']; ?>" placeholder="<?php echo $plat['commentaire'] ?>" id="inputTextCommentaire">
 
                                             <input type="hidden" name="old_commentaire" value="<?php echo $plat['commentaire']; ?>">
 

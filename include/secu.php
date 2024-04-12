@@ -13,52 +13,52 @@ if (isset($_SESSION["role"])) {
                     //case gérant les ajouts/suppressions/modifications dans les différentes tables de la bdd
                     switch ($_POST['action']) {
                         case "ajouter table": {
-                            $id_t = htmlspecialchars($_POST['id_table']);
-                            $num_table = htmlspecialchars($_POST['numero_table']);
-                            $type_table = htmlspecialchars($_POST['type_table']);
-                            $vu_table = htmlspecialchars($_POST['vu']);
-                        
-                            // Vérification si le numéro de table existe déjà
-                            $checkQuery = "SELECT id_table FROM sgr_table WHERE numero_table = ?";
-                            $checkStatement = $pdo->prepare($checkQuery);
-                            $checkStatement->execute([$num_table]);
-                            $existingTable = $checkStatement->fetch();
-                        
-                            if (!$existingTable) {
-                                $insertQuery = "INSERT INTO sgr_table (id_table, numero_table, type_table, vu) VALUES (NULL, ?, ?, ?)";
-                                $insertStatement = $pdo->prepare($insertQuery);
-                                $insertStatement->execute([$num_table, $type_table, $vu_table]);
-                                header('location: /SGRC/index.php?page=table');
-                            } else {
-                                echo "<script> alert('ERREUR : le numéro de table existe déjà !')</script>";
+                                $id_t = htmlspecialchars($_POST['id_table']);
+                                $num_table = htmlspecialchars($_POST['numero_table']);
+                                $type_table = htmlspecialchars($_POST['type_table']);
+                                $vu_table = htmlspecialchars($_POST['vu']);
+
+                                // Vérification si le numéro de table existe déjà
+                                $checkQuery = "SELECT id_table FROM sgr_table WHERE numero_table = ?";
+                                $checkStatement = $pdo->prepare($checkQuery);
+                                $checkStatement->execute([$num_table]);
+                                $existingTable = $checkStatement->fetch();
+
+                                if (!$existingTable) {
+                                    $insertQuery = "INSERT INTO sgr_table (id_table, numero_table, type_table, vu) VALUES (NULL, ?, ?, ?)";
+                                    $insertStatement = $pdo->prepare($insertQuery);
+                                    $insertStatement->execute([$num_table, $type_table, $vu_table]);
+                                    header('location: /SGRC/index.php?page=table');
+                                } else {
+                                    echo "<script> alert('ERREUR : le numéro de table existe déjà !')</script>";
+                                }
+                                break;
                             }
-                            break;
-                        }
- 
+
                         case "update table": {
-                            $id_t = htmlspecialchars($_POST['id_table']);
-                            $num_table = htmlspecialchars($_POST['numero_table']);
-                            $type_table = htmlspecialchars($_POST['type_table']);
-                            $vu_tb = htmlspecialchars($_POST['vu']);
-                            $vu_tb = ($vu_tb == 'Visible') ? '0' : '1';
-                        
-                            // Vérification si le numéro de table existe déjà
-                            $checkQuery = "SELECT id_table FROM sgr_table WHERE numero_table = ? AND id_table <> ?";
-                            $checkStatement = $pdo->prepare($checkQuery);
-                            $checkStatement->execute([$num_table, $id_t]);
-                            $existingTable = $checkStatement->fetch();
-                        
-                            if (!$existingTable) {
-                                $updateQuery = "UPDATE sgr_table SET numero_table=?, type_table=?, vu=? WHERE id_table=?";
-                                $updateStatement = $pdo->prepare($updateQuery);
-                                $updateStatement->execute([$num_table, $type_table, $vu_tb, $id_t]);
-                                header('location: /SGRC/index.php?page=table');
-                            } else {
-                                $_POST["id_t"] = $id_t;
-                                echo "<script> alert('ERREUR : le numéro de table existe déjà !')</script>";
+                                $id_t = htmlspecialchars($_POST['id_table']);
+                                $num_table = htmlspecialchars($_POST['numero_table']);
+                                $type_table = htmlspecialchars($_POST['type_table']);
+                                $vu_tb = htmlspecialchars($_POST['vu']);
+                                $vu_tb = ($vu_tb == 'Visible') ? '0' : '1';
+
+                                // Vérification si le numéro de table existe déjà
+                                $checkQuery = "SELECT id_table FROM sgr_table WHERE numero_table = ? AND id_table <> ?";
+                                $checkStatement = $pdo->prepare($checkQuery);
+                                $checkStatement->execute([$num_table, $id_t]);
+                                $existingTable = $checkStatement->fetch();
+
+                                if (!$existingTable) {
+                                    $updateQuery = "UPDATE sgr_table SET numero_table=?, type_table=?, vu=? WHERE id_table=?";
+                                    $updateStatement = $pdo->prepare($updateQuery);
+                                    $updateStatement->execute([$num_table, $type_table, $vu_tb, $id_t]);
+                                    header('location: /SGRC/index.php?page=table');
+                                } else {
+                                    $_POST["id_t"] = $id_t;
+                                    echo "<script> alert('ERREUR : le numéro de table existe déjà !')</script>";
+                                }
+                                break;
                             }
-                            break;
-                        }
 
                         case "vis table": {
                                 if (isset($_POST['id_table'])) {
@@ -894,21 +894,24 @@ if (isset($_SESSION["role"])) {
                                     $etat = "Demandé";
 
                                     // Vérifier si le commentaire est vide
-                                    if ($commentaire == "") {
+                                    if (empty($commentaire)) {
                                         $commentaireCondition = 'commentaire IS NULL';
                                     } else {
                                         $commentaireCondition = 'commentaire = :commentaire';
                                     }
 
-                                    $sql = 'UPDATE ligne_ticket SET Etat = "En cours" WHERE id_ticket = :id_ticket AND id_plat = :id_plat AND Etat = :etat AND ' . $commentaireCondition;
-                                    $statmt = $pdo->prepare($sql);
+                                    // Utilisation de l'opérateur ternaire pour définir la condition Etat
+                                    $etatCondition = (empty($commentaire)) ? 'Etat = :etat' : 'Etat = :etat AND ' . $commentaireCondition;
 
+                                    $sql = 'UPDATE ligne_ticket SET Etat = "En cours" WHERE id_ticket = :id_ticket AND id_plat = :id_plat AND ' . $etatCondition;
+
+                                    $statmt = $pdo->prepare($sql);
                                     $statmt->bindParam(':id_ticket', $id_ticket, PDO::PARAM_INT);
                                     $statmt->bindParam(':id_plat', $id_plat, PDO::PARAM_INT);
                                     $statmt->bindParam(':etat', $etat, PDO::PARAM_STR);
 
                                     // Ne lier le paramètre que si le commentaire n'est pas vide
-                                    if ($commentaire != "") {
+                                    if (!empty($commentaire)) {
                                         $statmt->bindParam(':commentaire', $commentaire, PDO::PARAM_STR);
                                     }
 
@@ -1310,76 +1313,72 @@ if (isset($_SESSION["role"])) {
                             }
 
                         case "etatDemande": {
-                            try{
-                                $id_ticket = $_POST['id_ticket'];
-                                $id_plat = $_POST['id_plat'];
-                                $commentaire = $_POST['commentaire'];
-                                $etat = "En saisie"; 
+                                try {
+                                    $id_ticket = $_POST['id_ticket'];
+                                    $id_plat = $_POST['id_plat'];
+                                    $commentaire = $_POST['commentaire'];
+                                    $etat = "En saisie";
 
-                                // Vérifier si le commentaire est vide
-                                if ($commentaire == "") {
-                                    $commentaireCondition = 'commentaire IS NULL';
-                                } else {
-                                    $commentaireCondition = 'commentaire = :commentaire';
+                                    // Vérifier si le commentaire est vide
+                                    if ($commentaire == "") {
+                                        $commentaireCondition = 'commentaire IS NULL';
+                                    } else {
+                                        $commentaireCondition = 'commentaire = :commentaire';
+                                    }
+
+                                    $sql = 'UPDATE ligne_ticket SET Etat = "Demandé" WHERE id_ticket = :id_ticket AND id_plat = :id_plat AND Etat = :etat AND ' . $commentaireCondition;
+                                    $statmt = $pdo->prepare($sql);
+
+                                    $statmt->bindParam(':id_ticket', $id_ticket, PDO::PARAM_INT);
+                                    $statmt->bindParam(':id_plat', $id_plat, PDO::PARAM_INT);
+                                    $statmt->bindParam(':etat', $etat, PDO::PARAM_STR);
+
+                                    // Ne lier le paramètre que si le commentaire n'est pas vide
+                                    if ($commentaire != "") {
+                                        $statmt->bindParam(':commentaire', $commentaire, PDO::PARAM_STR);
+                                    }
+
+                                    $statmt->execute();
+                                } catch (PDOException $e) {
+                                    echo $e->getMessage();
                                 }
-                                
-                                $sql = 'UPDATE ligne_ticket SET Etat = "Demandé" WHERE id_ticket = :id_ticket AND id_plat = :id_plat AND Etat = :etat AND '. $commentaireCondition;
-                                $statmt = $pdo->prepare($sql);
-                                
-                                $statmt->bindParam(':id_ticket', $id_ticket, PDO::PARAM_INT);
-                                $statmt->bindParam(':id_plat', $id_plat, PDO::PARAM_INT);
-                                $statmt->bindParam(':etat', $etat, PDO::PARAM_STR);
 
-                                // Ne lier le paramètre que si le commentaire n'est pas vide
-                                if ($commentaire != "") {
-                                    $statmt->bindParam(':commentaire', $commentaire, PDO::PARAM_STR);
-                                }
-
-                                $statmt->execute();
-
+                                break;
                             }
-                            catch(PDOException $e){
-                                echo $e->getMessage();
-                            }
-                            
-                            break;
-                        }
 
                         case "etatServi": {
-                            try{
-                                $id_ticket = $_POST['id_ticket'];
-                                $id_plat = $_POST['id_plat'];
-                                $commentaire = $_POST['commentaire'];
-                                $etat = "Prêt"; 
+                                try {
+                                    $id_ticket = $_POST['id_ticket'];
+                                    $id_plat = $_POST['id_plat'];
+                                    $commentaire = $_POST['commentaire'];
+                                    $etat = "Prêt";
 
-                                // Vérifier si le commentaire est vide
-                                if ($commentaire == "") {
-                                    $commentaireCondition = 'commentaire IS NULL';
-                                } else {
-                                    $commentaireCondition = 'commentaire = :commentaire';
+                                    // Vérifier si le commentaire est vide
+                                    if ($commentaire == "") {
+                                        $commentaireCondition = 'commentaire IS NULL';
+                                    } else {
+                                        $commentaireCondition = 'commentaire = :commentaire';
+                                    }
+
+                                    $sql = 'UPDATE ligne_ticket SET Etat = "Servi" WHERE id_ticket = :id_ticket AND id_plat = :id_plat AND Etat = :etat AND ' . $commentaireCondition;
+                                    $statmt = $pdo->prepare($sql);
+
+                                    $statmt->bindParam(':id_ticket', $id_ticket, PDO::PARAM_INT);
+                                    $statmt->bindParam(':id_plat', $id_plat, PDO::PARAM_INT);
+                                    $statmt->bindParam(':etat', $etat, PDO::PARAM_STR);
+
+                                    // Ne lier le paramètre que si le commentaire n'est pas vide
+                                    if ($commentaire != "") {
+                                        $statmt->bindParam(':commentaire', $commentaire, PDO::PARAM_STR);
+                                    }
+
+                                    $statmt->execute();
+                                } catch (PDOException $e) {
+                                    echo $e->getMessage();
                                 }
-                                
-                                $sql = 'UPDATE ligne_ticket SET Etat = "Servi" WHERE id_ticket = :id_ticket AND id_plat = :id_plat AND Etat = :etat AND '. $commentaireCondition;
-                                $statmt = $pdo->prepare($sql);
-                                
-                                $statmt->bindParam(':id_ticket', $id_ticket, PDO::PARAM_INT);
-                                $statmt->bindParam(':id_plat', $id_plat, PDO::PARAM_INT);
-                                $statmt->bindParam(':etat', $etat, PDO::PARAM_STR);
 
-                                // Ne lier le paramètre que si le commentaire n'est pas vide
-                                if ($commentaire != "") {
-                                    $statmt->bindParam(':commentaire', $commentaire, PDO::PARAM_STR);
-                                }
-
-                                $statmt->execute();
-
+                                break;
                             }
-                            catch(PDOException $e){
-                                echo $e->getMessage();
-                            }
-                            
-                            break;
-                        }
 
                         default: {
                             }
