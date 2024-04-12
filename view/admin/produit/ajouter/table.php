@@ -6,7 +6,7 @@ if (!isset($_SESSION)) {
     session_start();
 }
 if ($_SESSION["role"] == "admin") {
-            
+
 ?>
     <!DOCTYPE html>
     <html lang="fr">
@@ -23,7 +23,7 @@ if ($_SESSION["role"] == "admin") {
         <div class="right">
             <div class="theme-toggler" id="theme-toggler">
                 <!-- Dark and Light -->
-                <i><img class="icon_darkmode" src="image\icone\darkmode.svg" alt="Icone Dark Mode"></i>
+                <i><img class="icon_darkmode" src="image\icone\darkmode.svg" alt="🌙"></i>
             </div>
         </div>
         <form action="" method="POST" id="ValidationDuFormulaireTable">
@@ -67,14 +67,12 @@ if ($_SESSION["role"] == "admin") {
             <p style="color: red;" id="erreur"></p>
         </form>
 
-        
+
 
         <!-- Script DarkMode -->
         <script src="/SGRC/js/source/dark_mode.js"></script>
         <!-- SCRIPT FONT AWESOME -->
         <script src="https://kit.fontawesome.com/438cd94e6c.js" crossorigin="anonymous"></script>
-        <!-- Script ValidationJS -->
-        <script src="/SGRC/js/admin/produit/ajouter_modifier/verification-table.js"></script>
     </body>
 
     </html>

@@ -185,6 +185,28 @@ if ($_SESSION["role"] == "admin") {
         const affichageCuisine = document.getElementById("tab-button-1");
         affichageCuisine.click();
         
+
+        // Sélectionne toutes les lignes du tableau ayant la classe 'tableauMenu', à partir de la deuxième ligne
+        const tableRows = document.querySelectorAll('.tableauMenu tr');
+        const rowsToIterate = Array.from(tableRows).slice(1); // Exclut la première ligne
+
+        rowsToIterate.forEach((row, index) => {
+            // Sélectionne tous les boutons avec la classe 'icon_size' à l'intérieur de chaque ligne
+            const icons = row.querySelectorAll('td form button .icon_size');
+
+            icons.forEach((icon, i) => {
+                // Applique les styles alternés en fonction de la position de l'élément dans le tableau
+                if ((index + i) % 2 === 0) {
+                // Ligne paire
+                icon.style.backgroundColor = 'var(--color-cartemenu-dark)';
+                icon.style.color = 'var(--color-dark)';
+                } else {
+                // Ligne impaire
+                icon.style.backgroundColor = 'var(--color-cartemenu-light)';
+                icon.style.color = 'var(--color-dark)';
+            }});
+        });
+
     </script>
 </body>
 </html>

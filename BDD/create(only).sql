@@ -24,7 +24,13 @@ CREATE TABLE `ligne_ticket` (
   `id_ticket` int(11) NOT NULL,
   `id_plat` int(11) NOT NULL,
   `commentaire` varchar(255) DEFAULT NULL,
-  `Etat` enum('En saisie','Demandé', 'En cours', 'Prêt', 'Servi') DEFAULT 'En saisie'
+  `Etat` enum(
+    'En saisie',
+    'Demandé',
+    'En cours',
+    'Prêt',
+    'Servi'
+  ) DEFAULT 'En saisie'
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
 
 CREATE TABLE `menu` (
@@ -56,8 +62,12 @@ CREATE TABLE `sgr_table` (
   `numero_table` int(11) NOT NULL,
   `type_table` varchar(3) NOT NULL,
   `id_serveur` int(11) DEFAULT NULL,
-  `vu` int(1) NOT NULL
+  `vu` int(1) NOT NULL,
+  `left_position` INT NOT NULL,
+  `top_position` INT NOT NULL
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8;
+
+
 
 CREATE TABLE `sous_categorie` (
   `id_sous_cat` int(11) NOT NULL,
